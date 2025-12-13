@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oceanic Watch - Global Monitor (Light Edition)</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ocean: {
+                            dark: '#ffffff',
+                            /* Changed to White */
+                            light_bg: '#f8fafc',
+                            /* Slate 50 for section backgrounds */
+                            text_main: '#0f172a',
+                            /* Slate 900 for headings */
+                            text_sub: '#475569',
+                            /* Slate 600 for body text */
+                            card: 'rgba(255, 255, 255, 0.9)',
+                            /* White Glass */
+                            accent: '#0ea5e9',
+                            /* Sky 500 - Slightly darker blue for visibility on white */
+                            border: '#e2e8f0' /* Slate 200 */
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'glow': '0 0 20px rgba(14, 165, 233, 0.3)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Reset */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            background-color: #f8fafc;
+            /* Light Background */
+            color: #0f172a;
+            /* Dark Text */
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* HERO SECTION (Globe Area) */
+        #hero-section {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #bg-gradient {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            /* Light Gradient */
+            background: radial-gradient(circle at 50% 50%, #ffffff 0%, #e0f2fe 90%);
+            z-index: -1;
+        }
+
+        #globe-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            outline: none;
+        }
+
+        /* UI OVERLAY */
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Customization for "Rounded" look */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 9999px;
+            /* Pill shape */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-top: 1.5rem;
+            padding: 1rem 2rem;
+        }
+
+        /* Main Center Layout */
+        .main-center-layout {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: top;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            padding-top: 5rem;
+        }
+
+        /* Title Area */
+        .title-area {
+            text-align: center;
+            margin-bottom: 1rem;
+            pointer-events: auto;
+            z-index: 20;
+            /* No text shadow for clean look, or very subtle */
+        }
+
+        /* Interaction Row */
+        .interaction-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 2rem;
+            height: 80%;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .interaction-row {
+                flex-direction: column-reverse;
+                justify-content: flex-end;
+                padding-bottom: 6rem;
+                gap: 1rem;
+            }
+
+            .info-panel {
+                width: 100% !important;
+                transform: translateX(0) !important;
+                opacity: 1 !important;
+                margin-bottom: 10px;
+            }
+
+            .right-ui-stack {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+
+            .visual-panel {
+                display: none;
+            }
+
+            .nav-sidebar {
+                flex-direction: row !important;
+                padding-right: 0 !important;
+            }
+
+            .title-area h1 {
+                font-size: 2.5rem !important;
+            }
+
+            .glass-nav {
+                margin-top: 0.5rem;
+                width: 95%;
+                padding: 0.8rem 1rem;
+            }
+        }
+
+        .nav-link {
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+            /* Slate 600 */
+            transition: 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            /* Rounded buttons */
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        /* Info Panel (White Card) */
+        .info-panel {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            /* More rounded */
+            padding: 1.5rem;
+            pointer-events: auto;
+            transform: translateX(-20px);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            /* Soft shadow */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .info-panel.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Right UI Stack */
+        .right-ui-stack {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            gap: 1rem;
+            pointer-events: none;
+        }
+
+        /* Visual Panel (White Card) */
+        .visual-panel {
+            width: 220px;
+            height: 260px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 0.5rem;
+            pointer-events: auto;
+            transform: translateX(20px);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        @media (max-width: 768px) {
+            .visual-panel {
+                position: fixed;
+                bottom: 16px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 32px);
+                max-width: 360px;
+                height: 200px;
+                z-index: 50;
+            }
+        }
+
+
+        .visual-panel.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Nav Sidebar */
+        .nav-sidebar {
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            padding-right: 0.5rem;
+        }
+
+        .nav-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            color: #64748b;
+            /* Slate 500 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-icon:hover,
+        .nav-icon.active {
+            border-color: #0ea5e9;
+            color: #0ea5e9;
+            transform: scale(1.1);
+            background: #fff;
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .nav-icon::before {
+            content: attr(data-label);
+            position: absolute;
+            right: 65px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #0f172a;
+            padding: 4px 10px;
+            border-radius: 20px;
+            /* Rounded tooltip */
+            font-size: 11px;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .nav-icon::before {
+                right: auto;
+                bottom: 60px;
+            }
+        }
+
+        .nav-icon:hover::before {
+            opacity: 1;
+            right: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-icon:hover::before {
+                right: auto;
+                bottom: 55px;
+            }
+        }
+
+        /* Content Section */
+        #content-section {
+            background: #f8fafc;
+            /* Light BG */
+            position: relative;
+            z-index: 20;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .section-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+        }
+
+        .section-card:hover {
+            border-color: #0ea5e9;
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -5px rgba(14, 165, 233, 0.15);
+        }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #fff;
+            /* White loader bg */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: monospace;
+            color: #0ea5e9;
+            letter-spacing: 2px;
+            transition: opacity 0.5s;
+        }
+    </style>
+
+    <style>
+        .process-card {
+            position: relative;
+            padding: 2rem;
+            border-radius: 24px;
+            /* More rounded */
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+            color: #0f172a;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .process-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 25px 50px -12px rgba(14, 165, 233, 0.2);
+            border-color: #0ea5e9;
+        }
+
+        .process-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            color: #0f172a;
+        }
+
+        .process-card p {
+            font-size: 0.9rem;
+            color: #64748b;
+            /* Slate 500 */
+            margin-top: 0.5rem;
+        }
+
+        .step-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- MOBILE RESPONSIVE TWEAKS --- */
+        @media (max-width: 768px) {
+            .main-center-layout {
+                justify-content: space-between !important;
+                padding-top: 4rem;
+                padding-bottom: 2rem;
+            }
+
+            .interaction-row {
+                flex-direction: column-reverse;
+                justify-content: flex-end;
+                padding-bottom: 0 !important;
+                gap: 1rem;
+                height: auto !important;
+                width: 100%;
+            }
+
+            .info-panel {
+                width: 100% !important;
+                transform: translateX(0) !important;
+                opacity: 1 !important;
+                margin-bottom: 0px;
+            }
+
+            .right-ui-stack {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 0px;
+            }
+
+            .visual-panel {
+                display: none;
+            }
+
+            .nav-sidebar {
+                flex-direction: row !important;
+                padding-right: 0 !important;
+                justify-content: center;
+            }
+
+            .title-area {
+                margin-top: 0;
+            }
+
+            .title-area h1 {
+                font-size: 2.5rem !important;
+            }
+        }
+
+        /* Text Glow for light theme needs to be subtle dark glow or removed */
+        .text-glow {
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+            color: #0f172a;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="loader">INITIALIZING SYSTEM...</div>
+
+    <div class="relative w-full min-h-screen overflow-hidden bg-slate-50">
+
+        <video id="video1" autoplay muted playsinline preload="auto"
+            class="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-[4000ms] ease-in-out opacity-100">
+            <source src="fish.mp4" type="video/mp4">
+        </video>
+
+        <video id="video2" muted playsinline preload="auto"
+            class="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-[4000ms] ease-in-out opacity-0">
+            <source src="fish2.mp4" type="video/mp4">
+        </video>
+
+        <div class="absolute inset-0 bg-white/10 bg-gradient-to-b from-white/30 via-transparent to-white/90 z-0">
+        </div>
+
+        <div class="fixed top-0 left-0 w-full z-50 flex justify-center px-4">
+            <nav class="glass-nav flex items-center justify-between w-full max-w-7xl" data-aos="fade-down"
+                data-aos-duration="1000">
+
+                <div class="flex items-center gap-4">
+                    <img class="h-8 md:h-10 w-auto" src="logo.png" />
+
+                    <div class="leading-tight font-bold text-2xl md:text-3xl font-sans text-ocean-text_main">
+                        Oceava
+                    </div>
+                </div>
+
+
+                <div
+                    class="hidden md:flex space-x-2 text-xs font-semibold tracking-widest uppercase text-ocean-text_sub">
+                    <a href="#" class="nav-link">Products</a>
+                    <a href="#" class="nav-link">Logistics</a>
+                    <a href="#" class="nav-link">Sustainability</a>
+                    <a href="#" class="nav-link">About Us</a>
+                    <a href="#" class="nav-link">Contact</a>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    <button class="text-ocean-text_sub hover:text-ocean-accent transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                    <a href="#"
+                        class="hidden md:inline-block bg-ocean-accent text-white px-8 py-3 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-sky-600 transition shadow-glow">
+                        Get Quote
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+
+        <div
+            class="relative z-10 flex flex-col items-center justify-center h-[calc(100vh-100px)] text-center px-4 mt-20">
+            <p class="text-xs md:text-sm font-bold tracking-[0.3em] uppercase mb-4 text-ocean-text_main/80"
+                data-aos="fade-up" data-aos-delay="200">
+                Premium Tuna Logistic
+            </p>
+            <h1 class="text-5xl md:text-7xl lg:text-9xl font-medium tracking-widest uppercase mb-6 text-ocean-text_main font-sans drop-shadow-sm"
+                data-aos="zoom-in" data-aos-duration="1500">
+                Oceava
+            </h1>
+            <p class="max-w-2xl text-sm md:text-base text-gray-900 mb-10 leading-relaxed font-medium" data-aos="fade-up"
+                data-aos-delay="400">
+                Experience the pinnacle of marine excellence. We bridge the gap between the world's finest tuna
+                fisheries
+                and your table, ensuring unmatched freshness and quality.
+            </p>
+            <a href="#"
+                class="bg-white/80 backdrop-blur-sm border border-white text-ocean-text_main px-10 py-4 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-ocean-accent hover:text-white transition duration-300 shadow-soft"
+                data-aos="fade-up" data-aos-delay="600">
+                View Detail
+            </a>
+        </div>
+
+        <div class="absolute bottom-10 right-10 z-10 hidden md:block text-[10px] tracking-widest font-mono text-ocean-text_sub"
+            data-aos="fade-left" data-aos-delay="1000">
+            24.5467° N, 81.7950° W
+        </div>
+
+    </div>
+
+    <section
+        class="bg-white relative z-20 -mt-20 pt-1 pb-12 px-6 rounded-t-[40px] shadow-[0_-20px_60px_rgba(0,0,0,0.05)]">
+
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-24 mt-10">
+            <div class="w-full lg:w-5/12" data-aos="fade-right">
+                <p class="text-ocean-accent text-xs font-bold tracking-[0.25em] uppercase mb-4">Key Advantages</p>
+                <h2
+                    class="text-3xl md:text-4xl lg:text-5xl font-sans font-bold uppercase leading-tight text-ocean-text_main">
+                    Why Our Tuna Supply Chain Leads the Industry
+                </h2>
+                <div class="flex gap-2 mt-8">
+                    <div class="w-8 h-[3px] bg-ocean-text_main"></div>
+                    <div class="w-8 h-[3px] bg-ocean-text_main/40"></div>
+                    <div class="w-8 h-[3px] bg-ocean-text_main/20"></div>
+                </div>
+            </div>
+            <div class="w-full lg:w-7/12" data-aos="fade-left" data-aos-delay="200">
+                <ul class="space-y-10">
+                    <li class="relative pl-8 text-ocean-text_sub text-sm md:text-base leading-relaxed">
+                        <span class="absolute left-0 top-0 text-ocean-accent text-xl leading-none">•</span>
+                        <strong class="text-ocean-text_main">Global Certifications:</strong> MSC, ASC, and HACCP
+                        certified
+                        ensuring sustainable and safe sourcing from origin to destination.
+                    </li>
+                    <li class="relative pl-8 text-ocean-text_sub text-sm md:text-base leading-relaxed">
+                        <span class="absolute left-0 top-0 text-ocean-accent text-xl leading-none">•</span>
+                        <strong class="text-ocean-text_main">Expert Selection:</strong> Our grading specialists inspect
+                        every
+                        catch to ensure only sashimi-grade quality reaches our clients.
+                    </li>
+                    <li class="relative pl-8 text-ocean-text_sub text-sm md:text-base leading-relaxed">
+                        <span class="absolute left-0 top-0 text-ocean-accent text-xl leading-none">•</span>
+                        <strong class="text-ocean-text_main">Advanced Logistics:</strong> State-of-the-art cold chain
+                        technology
+                        maintains -60°C throughout transit to preserve peak freshness.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="relative py-16 md:py-20 px-6 bg-ocean-light_bg">
+        <div class="max-w-7xl mx-auto">
+
+            <div class="text-center mb-12 md:mb-16" data-aos="fade-up">
+                <p class="text-ocean-accent text-xs font-bold tracking-[0.25em] uppercase mb-4">
+                    About Us
+                </p>
+                <h2 class="text-3xl md:text-5xl font-sans font-bold uppercase text-ocean-text_main">
+                    OCEAVA – Trusted Tuna Import Specialist
+                </h2>
+                <div class="w-16 h-[3px] bg-ocean-accent/30 mx-auto mt-6 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 md:mb-20">
+
+                <div data-aos="fade-right">
+                    <h3 class="text-2xl font-semibold text-ocean-text_main mb-4">
+                        Who We Are
+                    </h3>
+                    <p class="text-ocean-text_sub leading-relaxed mb-4">
+                        <strong class="text-ocean-text_main">OCEAVA</strong> is a Thailand-based tuna import company
+                        with over
+                        <strong class="text-ocean-text_main">Years of experience</strong> in the international seafood
+                        industry.
+                        We specialize in sourcing premium-grade tuna from trusted partners in
+                        Japan, Taiwan, and Vietnam.
+                    </p>
+                    <p class="text-ocean-text_sub leading-relaxed">
+                        Our operations cover the entire supply chain — from origin sourcing and quality inspection
+                        to cold chain logistics, customs clearance, and delivery to processing facilities across
+                        Thailand.
+                    </p>
+                </div>
+
+                <div class="relative h-80 overflow-hidden rounded-3xl shadow-soft" data-aos="fade-left">
+                    <img src="https://images.unsplash.com/photo-1566177229701-8895c29b9c68?q=80&w=1170&auto=format&fit=crop"
+                        alt="OCEAVA Warehouse"
+                        class="w-full h-full object-cover hover:scale-110 transition duration-700">
+                </div>
+
+            </div>
+
+            <div class="mb-16 md:mb-20">
+                <h3 class="text-2xl font-semibold text-ocean-text_main text-center mb-10" data-aos="fade-up">
+                    International Standards & Certifications
+                </h3>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+
+                    <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition"
+                        data-aos="flip-up" data-aos-delay="0">
+                        <h4 class="text-ocean-text_main font-bold mb-2">HACCP</h4>
+                        <p class="text-ocean-text_sub text-sm">Food Safety Management</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition"
+                        data-aos="flip-up" data-aos-delay="100">
+                        <h4 class="text-ocean-text_main font-bold mb-2">GMP</h4>
+                        <p class="text-ocean-text_sub text-sm">Good Manufacturing Practice</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition"
+                        data-aos="flip-up" data-aos-delay="200">
+                        <h4 class="text-ocean-text_main font-bold mb-2">ISO 22000</h4>
+                        <p class="text-ocean-text_sub text-sm">Food Safety Management System</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition"
+                        data-aos="flip-up" data-aos-delay="300">
+                        <h4 class="text-ocean-text_main font-bold mb-2">FDA</h4>
+                        <p class="text-ocean-text_sub text-sm">Food & Drug Administration</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 md:mb-20">
+
+                <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-soft" data-aos="fade-up"
+                    data-aos-delay="0">
+                    <h3 class="text-xl font-bold text-ocean-text_main mb-4">Our Mission</h3>
+                    <p class="text-ocean-text_sub leading-relaxed">
+                        To deliver high-quality tuna products to the Thai market with transparency,
+                        safety, and efficiency — ensuring every shipment meets international standards
+                        and customer expectations.
+                    </p>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-soft" data-aos="fade-up"
+                    data-aos-delay="200">
+                    <h3 class="text-xl font-bold text-ocean-text_main mb-4">Quality Commitment</h3>
+                    <p class="text-ocean-text_sub leading-relaxed">
+                        We maintain strict quality control at every stage of the supply chain,
+                        supported by certified processes, real-time temperature monitoring,
+                        and professional inspection teams.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <div class="relative h-72 overflow-hidden rounded-3xl group shadow-soft" data-aos="zoom-in"
+                    data-aos-delay="0">
+                    <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=1074&auto=format&fit=crop"
+                        alt="OCEAVA Team"
+                        class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition"></div>
+                    <span
+                        class="absolute bottom-4 left-4 text-white font-bold text-sm uppercase tracking-widest drop-shadow-md">
+                        Professional Team
+                    </span>
+                </div>
+
+                <div class="relative h-72 overflow-hidden rounded-3xl group shadow-soft" data-aos="zoom-in"
+                    data-aos-delay="150">
+                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop"
+                        alt="Cold Storage Warehouse"
+                        class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition"></div>
+                    <span
+                        class="absolute bottom-4 left-4 text-white font-bold text-sm uppercase tracking-widest drop-shadow-md">
+                        Cold Storage Warehouse
+                    </span>
+                </div>
+
+                <div class="relative h-72 overflow-hidden rounded-3xl group shadow-soft" data-aos="zoom-in"
+                    data-aos-delay="300">
+                    <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=2070&auto=format&fit=crop"
+                        alt="Refrigerated Truck"
+                        class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition"></div>
+                    <span
+                        class="absolute bottom-4 left-4 text-white font-bold text-sm uppercase tracking-widest drop-shadow-md">
+                        Refrigerated Logistics
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <section id="stats" class="max-w-7xl mx-auto mb-12 md:mb-16 px-6 -mt-10 relative z-30">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white border border-slate-100 shadow-xl p-8 rounded-3xl text-center" data-aos="fade-up"
+                data-aos-delay="0">
+                <div class="text-4xl font-sans font-bold text-ocean-text_main mb-2 stat-number" data-target="05">0
+                </div>
+                <div class="text-sm text-ocean-accent font-bold uppercase tracking-widest">Years Experience</div>
+            </div>
+            <div class="bg-white border border-slate-100 shadow-xl p-8 rounded-3xl text-center" data-aos="fade-up"
+                data-aos-delay="100">
+                <div class="text-4xl font-sans font-bold text-ocean-text_main mb-2 stat-number" data-target="12">0</div>
+                <div class="text-sm text-ocean-accent font-bold uppercase tracking-widest">Tons Delivered Yearly</div>
+            </div>
+            <div class="bg-white border border-slate-100 shadow-xl p-8 rounded-3xl text-center" data-aos="fade-up"
+                data-aos-delay="200">
+                <div class="text-4xl font-sans font-bold text-ocean-text_main mb-2 stat-number" data-target="30">0</div>
+                <div class="text-sm text-ocean-accent font-bold uppercase tracking-widest">Importing Countries</div>
+            </div>
+            <div class="bg-white border border-slate-100 shadow-xl p-8 rounded-3xl text-center" data-aos="fade-up"
+                data-aos-delay="300">
+                <div class="text-4xl font-sans font-bold text-ocean-text_main mb-2 stat-number" data-target="12">0</div>
+                <div class="text-sm text-ocean-accent font-bold uppercase tracking-widest">Partner Industry</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="max-w-7xl mx-auto py-16 px-6">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div class="w-full md:w-2/3" data-aos="fade-right">
+                <p class="text-ocean-accent text-xs font-bold tracking-[0.25em] uppercase mb-2">What We Do</p>
+                <h3 class="text-3xl md:text-4xl font-sans font-bold text-ocean-text_main mb-4">Comprehensive Solutions
+                </h3>
+                <p class="text-ocean-text_sub font-light leading-relaxed">
+                    End-to-end tuna importation and logistics services, ensuring quality from the ocean to your
+                    factory.
+                </p>
+            </div>
+            <div class="mt-6 md:mt-0 w-full md:w-auto text-left md:text-right" data-aos="fade-left">
+                <a href="#"
+                    class="text-ocean-accent hover:text-ocean-text_main transition text-sm uppercase tracking-wider border-b border-ocean-accent pb-1 font-bold">
+                    View Service Details
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <div class="section-card p-0 rounded-3xl group hover:-translate-y-2 transition duration-300 overflow-hidden flex flex-col h-full"
+                data-aos="fade-up" data-aos-delay="0">
+                <div class="h-48 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?q=80&w=2070&auto=format&fit=crop"
+                        alt="Fresh Tuna"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div
+                        class="absolute bottom-4 left-4 w-10 h-10 rounded-full bg-white flex items-center justify-center text-ocean-accent shadow-lg">
+                        <i class="fas fa-fish"></i>
+                    </div>
+                </div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <h4 class="text-xl font-sans text-ocean-text_main font-bold mb-2">Tuna Import</h4>
+                    <p class="text-sm text-ocean-text_sub leading-relaxed mb-4 flex-1">
+                        Direct sourcing from Japan, Taiwan, and Vietnam. Rigorous QC and documentation.
+                    </p>
+                    <a href="#"
+                        class="text-ocean-accent text-xs font-bold uppercase tracking-wider hover:text-ocean-text_main transition mt-auto">Learn
+                        More &rarr;</a>
+                </div>
+            </div>
+
+            <div class="section-card p-0 rounded-3xl group hover:-translate-y-2 transition duration-300 overflow-hidden flex flex-col h-full"
+                data-aos="fade-up" data-aos-delay="150">
+                <div class="h-48 overflow-hidden relative">
+
+                    <img src="https://images.unsplash.com/photo-1485575301924-6891ef935dcd?q=80&w=1974&auto=format&fit=crop"
+                        alt="Cold Chain Logistics"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div
+                        class="absolute bottom-4 left-4 w-10 h-10 rounded-full bg-white flex items-center justify-center text-ocean-accent shadow-lg">
+                        <i class="fas fa-snowflake"></i>
+                    </div>
+                </div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <h4 class="text-xl font-sans text-ocean-text_main font-bold mb-2">Cold Chain</h4>
+                    <p class="text-sm text-ocean-text_sub leading-relaxed mb-4 flex-1">
+                        Reefer trucks and cold storage with real-time temperature monitoring.
+                    </p>
+                    <a href="#"
+                        class="text-ocean-accent text-xs font-bold uppercase tracking-wider hover:text-ocean-text_main transition mt-auto">Learn
+                        More &rarr;</a>
+                </div>
+            </div>
+
+            <div class="section-card p-0 rounded-3xl group hover:-translate-y-2 transition duration-300 overflow-hidden flex flex-col h-full"
+                data-aos="fade-up" data-aos-delay="300">
+                <div class="h-48 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format&fit=crop"
+                        alt="Customs Documents"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div
+                        class="absolute bottom-4 left-4 w-10 h-10 rounded-full bg-white flex items-center justify-center text-ocean-accent shadow-lg">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                </div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <h4 class="text-xl font-sans text-ocean-text_main font-bold mb-2">Customs</h4>
+                    <p class="text-sm text-ocean-text_sub leading-relaxed mb-4 flex-1">
+                        Handling FDA, Fisheries Dept. compliance, and import permits seamlessly.
+                    </p>
+                    <a href="#"
+                        class="text-ocean-accent text-xs font-bold uppercase tracking-wider hover:text-ocean-text_main transition mt-auto">Learn
+                        More &rarr;</a>
+                </div>
+            </div>
+
+            <div class="section-card p-0 rounded-3xl group hover:-translate-y-2 transition duration-300 overflow-hidden flex flex-col h-full"
+                data-aos="fade-up" data-aos-delay="450">
+                <div class="h-48 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1724597500306-a4cbb7d1324e?q=80&w=2006&auto=format&fit=crop"
+                        alt="Cargo Ship"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div
+                        class="absolute bottom-4 left-4 w-10 h-10 rounded-full bg-white flex items-center justify-center text-ocean-accent shadow-lg">
+                        <i class="fas fa-ship"></i>
+                    </div>
+                </div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <h4 class="text-xl font-sans text-ocean-text_main font-bold mb-2">Freight</h4>
+                    <p class="text-sm text-ocean-text_sub leading-relaxed mb-4 flex-1">
+                        Optimized Sea and Air freight solutions for cost and speed.
+                    </p>
+                    <a href="#"
+                        class="text-ocean-accent text-xs font-bold uppercase tracking-wider hover:text-ocean-text_main transition mt-auto">Learn
+                        More &rarr;</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div id="hero-section" class="bg-slate-50">
+        <div id="bg-gradient"></div>
+        <canvas id="globe-canvas"></canvas>
+
+        <div id="ui-overlay">
+
+
+            <div class="main-center-layout">
+
+                <div class="title-area" data-aos="fade-down" data-aos-delay="500">
+                    <div
+                        class="flex items-center justify-center gap-3 text-ocean-text_main text-xl font-sans font-bold tracking-wider mb-2">
+                        <i class="fas fa-globe text-ocean-accent"></i> Global Network
+                    </div>
+                    <h1 class="text-3xl md:text-5xl font-sans leading-tight text-ocean-text_main mb-2">Sourcing <span
+                            class="text-ocean-accent">Origins</span></h1>
+
+                </div>
+
+                <div class="interaction-row -mt-20 md:-mt-30" data-aos="fade-up" data-aos-delay="800">
+                    <div class="info-panel" id="infoPanel">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="h-px w-8 bg-ocean-accent"></span>
+                            <span class="text-xs text-ocean-accent uppercase tracking-widest font-bold">Selected
+                                Tuna</span>
+                        </div>
+
+                        <h2 class="text-3xl font-sans text-ocean-text_main font-bold mb-2 leading-none" id="fishTitle">
+                            Loading...</h2>
+                        <p class="text-sm text-ocean-text_sub font-light leading-relaxed mb-6" id="fishDesc">
+                            Select a tuna around the world to view live data.
+                        </p>
+
+                        <div class="flex gap-3 mt-auto">
+                            <button
+                                class="flex-1 py-3 rounded-full border border-slate-200 text-ocean-text_main hover:bg-slate-50 text-xs uppercase tracking-wider transition font-bold">Details</button>
+                            <button
+                                class="flex-1 py-3 rounded-full bg-ocean-accent text-white hover:bg-sky-600 text-xs uppercase tracking-wider font-bold transition">Track</button>
+                        </div>
+                    </div>
+
+                    <div class="right-ui-stack">
+
+                        <div class="visual-panel" id="visualPanel">
+                            <div
+                                class="relative w-full h-full rounded-2xl overflow-hidden border border-slate-100 group">
+                                <img id="fishImg"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    src="" alt="Fish">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            </div>
+                        </div>
+
+                        <div class="nav-sidebar" id="navContainer">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-section" class="py-5 md:py-5 px-4 md:px-12 bg-white">
+
+
+
+
+        <section id="tracking"
+            class="relative py-12 md:py-16 px-6 bg-slate-50 overflow-hidden rounded-[40px] border border-slate-200">
+
+            <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-50">
+                <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-200 rounded-full blur-[100px]"></div>
+                <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-200 rounded-full blur-[80px]"></div>
+                <div class="absolute inset-0 opacity-10"
+                    style="background-image: radial-gradient(#0f172a 1px, transparent 1px); background-size: 40px 40px;">
+                </div>
+            </div>
+
+            <div class="relative z-10 max-w-5xl mx-auto">
+
+                <div class="text-center mb-12" data-aos="fade-up">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-ocean-accent/30 bg-white text-ocean-accent text-xs font-bold tracking-widest uppercase mb-6 shadow-sm">
+                        <span class="relative flex h-2 w-2">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-ocean-accent opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-ocean-accent"></span>
+                        </span>
+                        Real-time Monitoring
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-sans font-bold text-ocean-text_main mb-4">Track Your Shipment
+                    </h2>
+                    <p class="text-ocean-text_sub font-light">Enter your Container No. or Booking ID to see the live
+                        status
+                        and temperature logs.</p>
+                </div>
+
+                <div class="bg-white/80 backdrop-blur-md border border-slate-200 p-2 rounded-2xl md:rounded-full flex flex-col md:flex-row gap-4 shadow-xl mb-16 max-w-3xl mx-auto"
+                    data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex-1 flex items-center px-6 py-3 md:py-0">
+                        <i class="fas fa-search text-gray-400 mr-4"></i>
+                        <input type="text" placeholder="Ex. OCV-2025-8894TH"
+                            class="w-full bg-transparent text-ocean-text_main placeholder-gray-400 focus:outline-none text-base md:text-lg tracking-wide font-mono font-semibold">
+                    </div>
+                    <button
+                        class="bg-ocean-text_main text-white px-8 py-3 rounded-xl md:rounded-full font-bold uppercase tracking-widest hover:bg-ocean-accent transition shadow-lg">
+                        Track Cargo
+                    </button>
+                </div>
+
+                <div class="bg-white/90 backdrop-blur-xl border border-slate-200 rounded-3xl overflow-hidden shadow-2xl"
+                    data-aos="zoom-in-up" data-aos-delay="300">
+
+                    <div
+                        class="bg-slate-50 px-8 py-4 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-white border border-slate-100 shadow-sm flex items-center justify-center text-ocean-accent">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Shipment ID</p>
+                                <p class="text-ocean-text_main font-mono font-bold text-lg">OCV-8894-JP</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider text-right font-semibold">
+                                    Origin</p>
+                                <p class="text-ocean-text_main font-semibold">Tokyo, JP</p>
+                            </div>
+                            <i class="fas fa-arrow-right text-gray-400"></i>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Destination</p>
+                                <p class="text-ocean-text_main font-semibold">Bangkok, TH</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3">
+
+                        <div class="lg:col-span-2 p-8 border-r border-slate-200">
+                            <div class="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+                                <div>
+                                    <p class="text-gray-500 text-sm mb-1 font-semibold">Current Status</p>
+                                    <h4 class="text-2xl text-ocean-text_main font-bold flex items-center gap-3">
+                                        In Transit
+                                        <span
+                                            class="px-2 py-0.5 rounded text-[10px] bg-green-100 text-green-700 border border-green-200 uppercase tracking-wide font-bold">On
+                                            Vessel</span>
+                                    </h4>
+                                    <p class="text-ocean-accent text-sm mt-1 break-words font-medium"><i
+                                            class="fas fa-location-dot mr-1"></i>
+                                        South China Sea (12.45° N, 113.8° E)</p>
+                                </div>
+                                <div class="text-left md:text-right">
+                                    <p class="text-gray-500 text-sm mb-1 font-semibold">ETA</p>
+                                    <p class="text-ocean-text_main font-mono text-xl font-bold">Dec 18, 2025</p>
+                                </div>
+                            </div>
+
+                            <div class="relative pl-4 border-l border-slate-200 space-y-8">
+                                <div class="relative">
+                                    <div
+                                        class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-ocean-accent shadow-[0_0_10px_#0ea5e9]">
+                                    </div>
+                                    <p class="text-ocean-text_main text-sm font-bold">Vessel Departed</p>
+                                    <p class="text-gray-500 text-xs">Dec 12, 14:30 • Tokyo Port</p>
+                                </div>
+                                <div class="relative">
+                                    <div
+                                        class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-ocean-accent shadow-[0_0_10px_#0ea5e9]">
+                                    </div>
+                                    <p class="text-ocean-text_main text-sm font-bold">Customs Cleared</p>
+                                    <p class="text-gray-500 text-xs">Dec 11, 09:15 • Tokyo Customs</p>
+                                </div>
+                                <div class="relative opacity-50">
+                                    <div
+                                        class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-slate-300 border border-slate-200">
+                                    </div>
+                                    <p class="text-slate-500 text-sm font-semibold">Arrive at Destination Port</p>
+                                    <p class="text-slate-400 text-xs">Pending</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-8 bg-slate-50/50">
+                            <p
+                                class="text-xs text-ocean-accent font-bold uppercase tracking-widest mb-6 border-b border-slate-200 pb-2">
+                                <i class="fas fa-snowflake mr-2"></i>Cold Chain Monitor
+                            </p>
+
+                            <div class="text-center mb-8">
+                                <div
+                                    class="relative inline-flex items-center justify-center w-32 h-32 rounded-full border-4 border-slate-200 mb-4 bg-white shadow-sm">
+                                    <div
+                                        class="absolute inset-0 rounded-full border-4 border-ocean-accent border-t-transparent animate-spin duration-[3000ms]">
+                                    </div>
+                                    <div>
+                                        <span class="text-3xl font-mono font-bold text-ocean-text_main">-18.4</span>
+                                        <span class="text-sm text-gray-500 block">°C</span>
+                                    </div>
+                                </div>
+                                <div
+                                    class="inline-block px-3 py-1 bg-green-100 border border-green-200 rounded text-green-700 text-xs font-bold uppercase">
+                                    Optimal
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="flex justify-between text-xs border-b border-slate-200 pb-2">
+                                    <span class="text-gray-500 font-semibold">Humidity</span>
+                                    <span class="text-ocean-text_main font-mono font-bold">85%</span>
+                                </div>
+                                <div class="flex justify-between text-xs border-b border-slate-200 pb-2">
+                                    <span class="text-gray-500 font-semibold">Container Type</span>
+                                    <span class="text-ocean-text_main font-bold">Reefer 40HC</span>
+                                </div>
+                                <div class="flex justify-between text-xs pb-2">
+                                    <span class="text-gray-500 font-semibold">Last Update</span>
+                                    <span class="text-ocean-text_main font-mono font-bold">10 mins ago</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mt-12 opacity-70 hover:opacity-100 transition duration-500"
+                    data-aos="fade-up" data-aos-delay="500">
+                    <div
+                        class="text-ocean-text_sub text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                        <i class="fas fa-satellite text-ocean-accent"></i> GPS Satellite
+                    </div>
+                    <div
+                        class="text-ocean-text_sub text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                        <i class="fas fa-shield-alt text-ocean-accent"></i> Secure Data
+                    </div>
+                    <div
+                        class="text-ocean-text_sub text-sm font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                        <i class="fas fa-temperature-low text-ocean-accent"></i> IoT Sensor
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+
+
+
+        <section class="relative h-auto py-16 md:py-20 overflow-hidden bg-white">
+
+            <canvas id="bgCanvas" class="absolute inset-0 z-0 opacity-30"></canvas>
+
+            <div class="relative z-10 max-w-7xl mx-auto px-6 h-full flex flex-col justify-center">
+
+                <div class="text-center mb-16" data-aos="fade-down">
+                    <h2
+                        class="text-3xl md:text-4xl font-sans font-bold text-ocean-text_main mb-4 uppercase tracking-wider">
+                        Import Process Flow
+                    </h2>
+                    <p class="text-ocean-text_sub font-light text-base md:text-lg">
+                        Rigorous quality control at every step, from upstream sources to your factory.
+                    </p>
+                    <div class="w-24 h-1 bg-ocean-accent mx-auto mt-6 rounded-full"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+                    <div class="process-card !p-0 overflow-hidden group flex flex-col h-full bg-white border border-slate-200 rounded-[32px] hover:border-ocean-accent transition-all duration-300 hover:shadow-2xl"
+                        data-aos="fade-up" data-aos-delay="0">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1170&auto=format&fit=crop"
+                                alt="Fishing Port"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+                            </div>
+                            <div
+                                class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white backdrop-blur-md shadow-lg flex items-center justify-center">
+                                <span class="text-ocean-accent font-bold text-lg font-mono">01</span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-1 relative">
+                            <h3 class="text-xl font-bold text-ocean-text_main mb-3 uppercase tracking-wide">Strategic
+                                Sourcing</h3>
+                            <p class="text-ocean-text_sub text-sm leading-relaxed">
+                                Selecting globally certified fisheries and farms (MSC/ASC) from Japan, Taiwan, and
+                                Vietnam.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="process-card !p-0 overflow-hidden group flex flex-col h-full bg-white border border-slate-200 rounded-[32px] hover:border-ocean-accent transition-all duration-300 hover:shadow-2xl"
+                        data-aos="fade-up" data-aos-delay="150">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1170&auto=format&fit=crop"
+                                alt="Quality Control"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+                            </div>
+                            <div
+                                class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white backdrop-blur-md shadow-lg flex items-center justify-center">
+                                <span class="text-ocean-accent font-bold text-lg font-mono">02</span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-1 relative">
+                            <h3 class="text-xl font-bold text-ocean-text_main mb-3 uppercase tracking-wide">Quality
+                                Inspection</h3>
+                            <p class="text-ocean-text_sub text-sm leading-relaxed">
+                                Expert teams inspect freshness, texture, and safety standards before loading onto
+                                containers.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="process-card !p-0 overflow-hidden group flex flex-col h-full bg-white border border-slate-200 rounded-[32px] hover:border-ocean-accent transition-all duration-300 hover:shadow-2xl"
+                        data-aos="fade-up" data-aos-delay="300">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop"
+                                alt="Cold Chain Logistics"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+                            </div>
+                            <div
+                                class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white backdrop-blur-md shadow-lg flex items-center justify-center">
+                                <span class="text-ocean-accent font-bold text-lg font-mono">03</span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-1 relative">
+                            <h3 class="text-xl font-bold text-ocean-text_main mb-3 uppercase tracking-wide">Cold Chain
+                                Logistics</h3>
+                            <p class="text-ocean-text_sub text-sm leading-relaxed">
+                                Transported via advanced cold chain systems maintaining temperatures between -20°C to
+                                -60°C.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="process-card !p-0 overflow-hidden group flex flex-col h-full bg-white border border-slate-200 rounded-[32px] hover:border-ocean-accent transition-all duration-300 hover:shadow-2xl"
+                        data-aos="fade-up" data-aos-delay="450">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1565891741441-64926e441838?q=80&w=1171&auto=format&fit=crop"
+                                alt="Factory Delivery"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+                            </div>
+                            <div
+                                class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white backdrop-blur-md shadow-lg flex items-center justify-center">
+                                <span class="text-ocean-accent font-bold text-lg font-mono">04</span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-1 relative">
+                            <h3 class="text-xl font-bold text-ocean-text_main mb-3 uppercase tracking-wide">Factory
+                                Delivery</h3>
+                            <p class="text-ocean-text_sub text-sm leading-relaxed">
+                                Delivered directly to your facility with complete documentation, ready for immediate
+                                production.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <section class="py-16 md:py-20 px-6 bg-slate-50 border-t border-slate-200">
+            <div class="max-w-7xl mx-auto text-center" data-aos="fade-up">
+                <p class="text-ocean-accent text-xs font-bold tracking-[0.25em] uppercase mb-4">
+                    Partnership
+                </p>
+                <h2 class="text-3xl md:text-5xl font-sans font-bold uppercase text-ocean-text_main">What Our Partners
+                    Say</h2>
+                <div class="w-16 h-[3px] bg-ocean-accent/30 mx-auto mt-6 mb-16 rounded-full"></div>
+            </div>
+
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-soft hover:scale-[1.03] transition duration-300"
+                    data-aos="fade-up" data-aos-delay="0">
+                    <p class="text-ocean-text_sub leading-relaxed mb-6 font-medium">
+                        “The Bluefin we received was impeccable. Freshness and texture were perfect for our Omakase
+                        menu.
+                        The delivery arrived exactly as scheduled.”
+                    </p>
+                    <div class="flex items-center space-x-4">
+                        <img src="https://i.pravatar.cc/80?img=12"
+                            class="w-12 h-12 rounded-full border border-slate-200" />
+                        <div>
+                            <p class="text-ocean-text_main font-bold">Sarah Mitchell</p>
+                            <p class="text-gray-400 text-xs tracking-wider uppercase font-semibold">Executive Chef</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-soft hover:scale-[1.03] transition duration-300"
+                    data-aos="fade-up" data-aos-delay="150">
+                    <p class="text-ocean-text_sub leading-relaxed mb-6 font-medium">
+                        “Reliable delivery and consistent quality. OCEAVA has become our primary supplier for premium
+                        tuna.
+                        Their transparency sets them apart.”
+                    </p>
+                    <div class="flex items-center space-x-4">
+                        <img src="https://i.pravatar.cc/80?img=32"
+                            class="w-12 h-12 rounded-full border border-slate-200" />
+                        <div>
+                            <p class="text-ocean-text_main font-bold">James Carter</p>
+                            <p class="text-gray-400 text-xs tracking-wider uppercase font-semibold">Restaurant Owner</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-100 p-8 rounded-3xl shadow-soft hover:scale-[1.03] transition duration-300"
+                    data-aos="fade-up" data-aos-delay="300">
+                    <p class="text-ocean-text_sub leading-relaxed mb-6 font-medium">
+                        “Their cold chain transparency gives us confidence. We know exactly where our fish comes from
+                        and it passes our strict QC every time.”
+                    </p>
+                    <div class="flex items-center space-x-4">
+                        <img src="https://i.pravatar.cc/80?img=5"
+                            class="w-12 h-12 rounded-full border border-slate-200" />
+                        <div>
+                            <p class="text-ocean-text_main font-bold">Lena Strauss</p>
+                            <p class="text-gray-400 text-xs tracking-wider uppercase font-semibold">Procurement Manager
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="py-16 md:py-20 px-6 bg-white border-t border-slate-200">
+            <div class="max-w-7xl mx-auto text-center" data-aos="fade-up">
+                <p class="text-ocean-accent text-xs font-bold tracking-[0.25em] uppercase mb-4">
+                    Our Team
+                </p>
+                <h2 class="text-3xl md:text-5xl font-sans font-bold uppercase text-ocean-text_main">Meet The Experts
+                </h2>
+                <div class="w-16 h-[3px] bg-ocean-accent/30 mx-auto mt-6 mb-16 rounded-full"></div>
+            </div>
+
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                <div class="group relative bg-white border border-slate-200 rounded-[32px] p-8 hover:border-ocean-accent transition duration-300 hover:shadow-xl flex flex-col items-center text-center"
+                    data-aos="fade-up" data-aos-delay="0">
+
+                    <div class="relative w-32 h-32 mb-6">
+                        <div
+                            class="absolute inset-0 bg-ocean-accent rounded-full blur-md opacity-0 group-hover:opacity-20 transition duration-500">
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=500"
+                            class="relative w-full h-full rounded-full object-cover border-4 border-slate-50 group-hover:border-ocean-accent transition duration-300"
+                            alt="Alex Morgan" />
+                    </div>
+
+                    <h3 class="text-xl font-bold text-ocean-text_main uppercase tracking-widest mb-1">Alex Morgan</h3>
+                    <p class="text-ocean-accent text-xs tracking-[0.25em] uppercase mb-4 font-bold">Sourcing Director
+                    </p>
+                    <p class="text-ocean-text_sub text-sm leading-relaxed mb-6 flex-1">
+                        15 years of experience establishing partnerships with Japanese fisheries and sustainable farms.
+                    </p>
+
+                    <div class="w-full mt-auto space-y-4">
+                        <div class="flex justify-center gap-4 text-gray-400">
+                            <a href="#" class="hover:text-ocean-accent transition"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="hover:text-ocean-accent transition"><i class="fab fa-twitter"></i></a>
+                        </div>
+                        <a href="mailto:alex@oceanhorizons.com?subject=Inquiry for Alex Morgan"
+                            class="block w-full py-3 rounded-full border border-slate-200 bg-slate-50 text-ocean-text_main text-xs font-bold uppercase tracking-widest hover:bg-ocean-accent hover:text-white hover:border-ocean-accent transition duration-300">
+                            Contact Alex
+                        </a>
+                    </div>
+                </div>
+
+                <div class="group relative bg-white border border-slate-200 rounded-[32px] p-8 hover:border-ocean-accent transition duration-300 hover:shadow-xl flex flex-col items-center text-center"
+                    data-aos="fade-up" data-aos-delay="150">
+
+                    <div class="relative w-32 h-32 mb-6">
+                        <div
+                            class="absolute inset-0 bg-ocean-accent rounded-full blur-md opacity-0 group-hover:opacity-20 transition duration-500">
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=500"
+                            class="relative w-full h-full rounded-full object-cover border-4 border-slate-50 group-hover:border-ocean-accent transition duration-300"
+                            alt="Mia Thompson" />
+                    </div>
+
+                    <h3 class="text-xl font-bold text-ocean-text_main uppercase tracking-widest mb-1">Mia Thompson</h3>
+                    <p class="text-ocean-accent text-xs tracking-[0.25em] uppercase mb-4 font-bold">Quality Assurance
+                        Lead</p>
+                    <p class="text-ocean-text_sub text-sm leading-relaxed mb-6 flex-1">
+                        Specialized in food safety standards, HACCP compliance, and freshness grading.
+                    </p>
+
+                    <div class="w-full mt-auto space-y-4">
+                        <div class="flex justify-center gap-4 text-gray-400">
+                            <a href="#" class="hover:text-ocean-accent transition"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="hover:text-ocean-accent transition"><i class="fas fa-envelope"></i></a>
+                        </div>
+                        <a href="mailto:mia@oceanhorizons.com?subject=Inquiry for Mia Thompson"
+                            class="block w-full py-3 rounded-full border border-slate-200 bg-slate-50 text-ocean-text_main text-xs font-bold uppercase tracking-widest hover:bg-ocean-accent hover:text-white hover:border-ocean-accent transition duration-300">
+                            Contact Mia
+                        </a>
+                    </div>
+                </div>
+
+                <div class="group relative bg-white border border-slate-200 rounded-[32px] p-8 hover:border-ocean-accent transition duration-300 hover:shadow-xl flex flex-col items-center text-center"
+                    data-aos="fade-up" data-aos-delay="300">
+
+                    <div class="relative w-32 h-32 mb-6">
+                        <div
+                            class="absolute inset-0 bg-ocean-accent rounded-full blur-md opacity-0 group-hover:opacity-20 transition duration-500">
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500"
+                            class="relative w-full h-full rounded-full object-cover border-4 border-slate-50 group-hover:border-ocean-accent transition duration-300"
+                            alt="Ethan Wells" />
+                    </div>
+
+                    <h3 class="text-xl font-bold text-ocean-text_main uppercase tracking-widest mb-1">Ethan Wells</h3>
+                    <p class="text-ocean-accent text-xs tracking-[0.25em] uppercase mb-4 font-bold">Logistics Manager
+                    </p>
+                    <p class="text-ocean-text_sub text-sm leading-relaxed mb-6 flex-1">
+                        Expert in international cold chain management, freight optimization, and customs clearance.
+                    </p>
+
+                    <div class="w-full mt-auto space-y-4">
+                        <div class="flex justify-center gap-4 text-gray-400">
+                            <a href="#" class="hover:text-ocean-accent transition"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="hover:text-ocean-accent transition"><i class="fas fa-envelope"></i></a>
+                        </div>
+                        <a href="mailto:ethan@oceanhorizons.com?subject=Inquiry for Ethan Wells"
+                            class="block w-full py-3 rounded-full border border-slate-200 bg-slate-50 text-ocean-text_main text-xs font-bold uppercase tracking-widest hover:bg-ocean-accent hover:text-white hover:border-ocean-accent transition duration-300">
+                            Contact Ethan
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="py-16 md:py-20 px-6 bg-slate-50">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16">
+
+                <div class="w-full md:w-1/3" data-aos="fade-right">
+                    <h2
+                        class="text-3xl md:text-4xl font-sans font-bold uppercase text-ocean-text_main leading-tight mb-6">
+                        Get in <br> <span class="text-ocean-accent">Touch</span>
+                    </h2>
+                    <p class="text-ocean-text_sub text-sm leading-relaxed mb-8 font-medium">
+                        Connect with OCEAVA for reliable tuna import solutions, cold chain logistics,
+                        and professional customs clearance services in Thailand.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#map"
+                            class="bg-ocean-text_main text-center text-white px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-ocean-accent rounded-full transition shadow-lg">
+                            View Location
+                        </a>
+                        <a href="mailto:info@oceava.co.th"
+                            class="border border-slate-300 text-center text-ocean-text_main px-6 py-3 text-xs font-bold uppercase tracking-widest hover:border-ocean-accent hover:text-ocean-accent rounded-full transition">
+                            Contact Us
+                        </a>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div class="bg-white p-8 border border-slate-200 rounded-3xl hover:border-ocean-accent transition duration-300 shadow-soft"
+                        data-aos="fade-up" data-aos-delay="0">
+                        <div class="text-ocean-accent mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M9 20l-5.447-2.724A2 2 0 013 15.382V6.618a2 2 0 011.553-1.948L9 3m0 17l6-3m-6 3V3m6 14l5.447-2.724A2 2 0 0021 15.382V6.618a2 2 0 00-1.553-1.948L15 3m0 14V3" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-ocean-text_main uppercase tracking-wider mb-2">
+                            Company Location
+                        </h3>
+                        <p class="text-ocean-text_sub text-sm mb-4">
+                            Our headquarters and cold storage facilities are located in Thailand,
+                            supporting nationwide distribution.
+                        </p>
+                        <a href="#map"
+                            class="text-ocean-accent text-xs uppercase tracking-widest border-b border-ocean-accent pb-1 hover:text-ocean-text_main transition font-bold">
+                            View on Map
+                        </a>
+                    </div>
+
+                    <div class="bg-white p-8 border border-slate-200 rounded-3xl hover:border-ocean-accent transition duration-300 shadow-soft"
+                        data-aos="fade-up" data-aos-delay="200">
+                        <div class="text-ocean-accent mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 8h18a2 2 0 002-2V8a2 2 0 00-2-2H3a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-ocean-text_main uppercase tracking-wider mb-2">
+                            Stay Updated
+                        </h3>
+                        <p class="text-ocean-text_sub text-sm mb-4">
+                            Subscribe to receive updates on tuna market insights,
+                            logistics news, and company announcements.
+                        </p>
+
+                        <form class="flex flex-col sm:flex-row gap-2">
+                            <input type="email" placeholder="Your email address"
+                                class="w-full bg-slate-50 border border-slate-200 px-4 py-2 text-sm text-ocean-text_main placeholder-gray-400 focus:outline-none focus:border-ocean-accent rounded-full">
+                            <button type="submit"
+                                class="bg-ocean-accent text-white px-4 py-2 text-xs font-bold uppercase tracking-widest hover:bg-sky-600 transition rounded-full shadow-lg">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <footer class="bg-white pt-16 pb-8 px-6 border-t border-slate-200 text-sm">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+
+                    <div class="md:col-span-1" data-aos="fade-up">
+                        <div class="text-2xl font-bold leading-tight text-ocean-text_main mb-6">
+                            Oceava
+                        </div>
+                        <p class="text-ocean-text_sub mb-6 leading-relaxed">
+                            Thailand-based tuna import company with over Years of experience in the international
+                            seafood industry.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-400 hover:text-ocean-accent transition"><svg class="w-5 h-5"
+                                    fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                                </svg></a>
+                            <a href="#" class="text-gray-400 hover:text-ocean-accent transition"><svg class="w-5 h-5"
+                                    fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                                </svg></a>
+                        </div>
+                    </div>
+
+                    <div data-aos="fade-up" data-aos-delay="100">
+                        <h4 class="text-ocean-text_main font-bold uppercase tracking-widest mb-6">Company</h4>
+                        <ul class="space-y-4 text-ocean-text_sub">
+                            <li><a href="#" class="hover:text-ocean-accent transition">About Us</a></li>
+                            <li><a href="#" class="hover:text-ocean-accent transition">Our Team</a></li>
+                            <li><a href="#" class="hover:text-ocean-accent transition">Careers</a></li>
+                            <li><a href="#" class="hover:text-ocean-accent transition">Press & Media</a></li>
+                        </ul>
+                    </div>
+
+                    <div data-aos="fade-up" data-aos-delay="200">
+                        <h4 class="text-ocean-text_main font-bold uppercase tracking-widest mb-6">Support</h4>
+                        <ul class="space-y-4 text-ocean-text_sub">
+                            <li><a href="#" class="hover:text-ocean-accent transition">Contact Us</a></li>
+                            <li><a href="#" class="hover:text-ocean-accent transition">FAQ</a></li>
+                            <li><a href="#" class="hover:text-ocean-accent transition">Privacy Policy</a></li>
+                            <li><a href="#" class="hover:text-ocean-accent transition">Terms of Service</a></li>
+                        </ul>
+                    </div>
+
+                    <div data-aos="fade-up" data-aos-delay="300">
+                        <h4 class="text-ocean-text_main font-bold uppercase tracking-widest mb-6">Get in Touch</h4>
+                        <p class="text-ocean-text_sub mb-4">
+                            111/222 Bangsue<br>
+                            Bangkok, 10800
+                        </p>
+                        <p class="text-ocean-text_main font-bold">oceavastaff@oceava.com</p>
+                        <p class="text-ocean-text_main font-bold">+66 555 8888</p>
+                    </div>
+
+                </div>
+
+                <div
+                    class="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
+                    <p>&copy; 2025 Oceava Company. All rights reserved.</p>
+
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100,
+        });
+    </script>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script id="vertexShader" type="x-shader/x-vertex">
+        varying vec3 vNormal;
+        void main() {
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    </script>
+    <script id="fragmentShader" type="x-shader/x-fragment">
+        varying vec3 vNormal;
+        void main() {
+            float intensity = pow(0.55 - dot(vNormal, vec3(0, 0, 1.0)), 4.5);
+            // Changed glow to match blue accent
+            gl_FragColor = vec4(0.05, 0.65, 0.91, 1.0) * intensity;
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // --- Configuration ---
+        const GLOBE_RADIUS = 1.35; 
+
+        // --- Data ---
+        const fishData = [
+            { id: 0, name: "Atlantic Bluefin", icon: "fa-fish", lat: 35.0, lon: -40.0, img: "https://images.unsplash.com/photo-1609529666719-1d61af4bb351?q=80&w=687&auto=format&fit=crop", desc: "The largest of the tuna species, prized for sushi. They are powerful swimmers and migrate across the Atlantic." },
+            { id: 1, name: "Yellowfin Tuna", icon: "fa-water", lat: 5.0, lon: -120.0, img: "https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?q=80&w=1170&auto=format&fit=crop", desc: "Named for their bright yellow fins. Found in tropical oceans, they are a key species for both commercial and sport fishing." },
+            { id: 2, name: "Albacore", icon: "fa-circle-dot", lat: -35.0, lon: 175.0, img: "https://images.unsplash.com/photo-1562053923-52d3ebb09d31?q=80&w=1170&auto=format&fit=crop", desc: "Known for their unusually long pectoral fins. They prefer cooler waters and are the source of 'white' canned tuna." },
+            { id: 3, name: "Bigeye Tuna", icon: "fa-eye", lat: -10.0, lon: 70.0, img: "https://images.unsplash.com/photo-1697030891256-36a3770cddde?q=80&w=1365&auto=format&fit=crop", desc: "Deep divers with large eyes adapted for low light. They hunt in the cold depths during the day." }
+        ];
+
+        // --- Scene Init ---
+        const canvas = document.getElementById('globe-canvas');
+        const scene = new THREE.Scene();
+        // Removed heavy black fog, use light fog
+        scene.fog = new THREE.FogExp2(0xffffff, 0.002);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+        // --- Responsive Camera Logic ---
+        function updateCameraPosition() {
+            if (window.innerWidth < 768) {
+                // Mobile: Move camera back slightly to fit globe better
+                camera.position.set(0, 0, 6.5); 
+            } else {
+                // Desktop: Default position
+                camera.position.set(0, 0, 5.2);
+            }
+        }
+        updateCameraPosition(); // Initial call
+
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for mobile performance
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+        const controls = new OrbitControls(camera, canvas);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enablePan = false;
+        controls.enableZoom = false;
+        controls.minDistance = 4;
+        controls.maxDistance = 8; // Increased for mobile freedom
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.6;
+
+        // --- Globe ---
+        const earthGroup = new THREE.Group();
+        earthGroup.rotation.z = 23.5 * Math.PI / 180;
+        scene.add(earthGroup);
+
+        const textureLoader = new THREE.TextureLoader();
+        const earth = new THREE.Mesh(
+            new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64), 
+            new THREE.MeshPhongMaterial({
+                map: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),
+                bumpMap: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-topology.png'),
+                bumpScale: 0.05,
+                specularMap: textureLoader.load('https://unpkg.com/three-globe/example/img/earth-water.png'),
+                specular: new THREE.Color(0x333333),
+                shininess: 12
+            })
+        );
+        earthGroup.add(earth);
+
+        // Clouds
+        const clouds = new THREE.Mesh(
+            new THREE.SphereGeometry(GLOBE_RADIUS + 0.02, 64, 64),
+            new THREE.MeshLambertMaterial({
+                map: textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png'),
+                transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, side: THREE.DoubleSide
+            })
+        );
+        earthGroup.add(clouds);
+
+        // Atmosphere Glow
+        const atmos = new THREE.Mesh(
+            new THREE.SphereGeometry(GLOBE_RADIUS + 0.2, 64, 64),
+            new THREE.ShaderMaterial({
+                vertexShader: document.getElementById('vertexShader').textContent,
+                fragmentShader: document.getElementById('fragmentShader').textContent,
+                blending: THREE.AdditiveBlending, side: THREE.BackSide, transparent: true, depthWrite: false
+            })
+        );
+        scene.add(atmos);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 3.5); // Brighter ambient for light theme
+        scene.add(ambientLight);
+        const sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
+        sunLight.position.set(-5, 3, 5);
+        scene.add(sunLight);
+        const rimLight = new THREE.DirectionalLight(0x0ea5e9, 4.0); // Blue rim light
+        rimLight.position.set(5, 0, -5);
+        scene.add(rimLight);
+
+        // --- Markers ---
+        function latLonToVector3(lat, lon, radius) {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lon + 180) * (Math.PI / 180);
+            const x = -(radius * Math.sin(phi) * Math.cos(theta));
+            const y = radius * Math.cos(phi);
+            const z = radius * Math.sin(phi) * Math.sin(theta);
+            return new THREE.Vector3(x, y, z);
+        }
+
+        const markerGroup = new THREE.Group();
+        earthGroup.add(markerGroup);
+
+        fishData.forEach(data => {
+            const marker = new THREE.Mesh(
+                new THREE.RingGeometry(0.04, 0.055, 32),
+                new THREE.MeshBasicMaterial({ color: 0x0ea5e9, side: THREE.DoubleSide, transparent:true, opacity: 0.8 })
+            );
+            marker.position.copy(latLonToVector3(data.lat, data.lon, GLOBE_RADIUS + 0.01));
+            marker.lookAt(0, 0, 0);
+            const dot = new THREE.Mesh(new THREE.CircleGeometry(0.02, 16), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+            marker.add(dot);
+            marker.userData = data;
+            markerGroup.add(marker);
+        });
+
+        // --- UI Interactions ---
+        const navContainer = document.getElementById('navContainer');
+        const infoPanel = document.getElementById('infoPanel');
+        const visualPanel = document.getElementById('visualPanel'); // New Panel
+        const titleEl = document.getElementById('fishTitle');
+        const descEl = document.getElementById('fishDesc');
+        const imgEl = document.getElementById('fishImg');
+
+        // Populate Right Nav
+        fishData.forEach((fish, index) => {
+            const btn = document.createElement('div');
+            btn.className = `nav-icon`;
+            btn.innerHTML = `<i class="fas ${fish.icon}"></i>`;
+            btn.setAttribute('data-label', fish.name);
+            btn.addEventListener('click', () => selectSpecies(fish, index));
+            navContainer.appendChild(btn);
+
+            if(index === 0) setTimeout(() => selectSpecies(fish, 0), 1000);
+        });
+
+        function selectSpecies(fish, index) {
+            // Update Nav State
+            document.querySelectorAll('.nav-icon').forEach(el => el.classList.remove('active'));
+            if(navContainer.children[index]) navContainer.children[index].classList.add('active');
+
+            // Update Panel
+            infoPanel.classList.remove('active');
+            visualPanel.classList.remove('active'); // Reset Visual Panel
+            
+            setTimeout(() => {
+                titleEl.textContent = fish.name;
+                descEl.textContent = fish.desc;
+                imgEl.src = fish.img;
+                
+                infoPanel.classList.add('active');
+                
+                visualPanel.classList.add('active'); 
+            }, 300);
+
+            // Rotate Globe
+            controls.autoRotate = false;
+            rotateGlobeTo(fish.lat, fish.lon);
+        }
+
+        let targetQuaternion = new THREE.Quaternion();
+        let isAnimating = false;
+
+        function rotateGlobeTo(lat, lon) {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lon + 180) * (Math.PI / 180);
+            const q = new THREE.Quaternion();
+            q.setFromEuler(new THREE.Euler(0, -theta - Math.PI/2, phi - Math.PI/2, 'YXZ'));
+            targetQuaternion.copy(q);
+            isAnimating = true;
+        }
+
+        // --- Raycasting for 3D Markers ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('pointerdown', (event) => {
+            if(event.target !== canvas) return;
+            
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(markerGroup.children);
+            if (intersects.length > 0) {
+                const data = intersects[0].object.userData;
+                const idx = fishData.findIndex(f => f.id === data.id);
+                selectSpecies(data, idx);
+            }
+        });
+
+        // --- Animations ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const target = parseFloat(el.dataset.target.replace(/,/g, ''));
+                    let count = 0;
+                    const inc = target / 50;
+                    const timer = setInterval(() => {
+                        count += inc;
+                        if (count >= target) {
+                            count = target;
+                            clearInterval(timer);
+                        }
+                        el.textContent = Math.floor(count).toLocaleString();
+                    }, 30);
+                    observer.unobserve(el);
+                }
+            });
+        });
+        document.querySelectorAll('.stat-number').forEach(el => observer.observe(el));
+
+        THREE.DefaultLoadingManager.onLoad = function () {
+            const loader = document.getElementById('loader');
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    if(typeof AOS !== 'undefined') {
+                        AOS.refresh(); 
+                    }
+                }, 500);
+            }
+        };
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            clouds.rotation.y += 0.0005;
+            
+            if (isAnimating) {
+                earthGroup.quaternion.slerp(targetQuaternion, 0.05);
+                if (earthGroup.quaternion.angleTo(targetQuaternion) < 0.002) isAnimating = false;
+            }
+            
+            atmos.position.copy(earthGroup.position);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            updateCameraPosition(); // Recalculate camera position for responsiveness
+        });
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        const canvasA = document.getElementById("bgCanvas");
+        
+        if (canvasA) {
+            const sceneA = new THREE.Scene();
+
+            const cameraA = new THREE.PerspectiveCamera(
+                60,
+                window.innerWidth / 700,
+                0.1,
+                1000
+            );
+            cameraA.position.z = 50;
+            cameraA.position.y = -10; 
+
+            const rendererA = new THREE.WebGLRenderer({
+                canvas: canvasA, 
+                alpha: true
+            });
+            rendererA.setSize(window.innerWidth, 700);
+            rendererA.setPixelRatio(window.devicePixelRatio);
+
+            const geometry = new THREE.PlaneGeometry(100, 60, 50, 50);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x0ea5e9, // Blue wireframe
+
+                wireframe: true,
+                opacity: 0.15, // lighter opacity
+                transparent: true,
+            });
+            const plane = new THREE.Mesh(geometry, material);
+            sceneA.add(plane);
+
+            plane.rotation.x = -1.2;
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                const time = Date.now() * 0.002;
+                
+                const positionAttribute = geometry.attributes.position;
+                
+                for (let i = 0; i < positionAttribute.count; i++) {
+                    const x = positionAttribute.getX(i);
+                    const y = positionAttribute.getY(i);
+                    const z = Math.sin(x / 5 + time) * 2 + Math.sin(y / 5 + time) * 2;
+                    
+                    positionAttribute.setZ(i, z);
+                }
+                
+                positionAttribute.needsUpdate = true;
+
+                rendererA.render(sceneA, cameraA);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                cameraA.aspect = window.innerWidth / 700;
+                cameraA.updateProjectionMatrix();
+                rendererA.setSize(window.innerWidth, 700);
+            });
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const video1 = document.getElementById('video1');
+            const video2 = document.getElementById('video2');
+
+            // ตั้งค่าเวลา Fade (หน่วยมิลลิวินาที) ให้ตรงกับ class duration-[4000ms]
+            const fadeDuration = 2000;
+
+            // ตัวแปรกันไม่ให้สลับซ้ำในรอบเดียวกัน
+            let isSwapping = false;
+
+            function checkTimeAndSwap(currentVideo, nextVideo) {
+                // คำนวณเวลาที่เหลือ
+                const timeRemaining = (currentVideo.duration - currentVideo.currentTime) * 1000;
+
+                // ถ้าเวลาเหลือน้อยกว่าเวลา Fade และยังไม่ได้เริ่มสลับ
+                if (timeRemaining <= fadeDuration && !isSwapping) {
+                    isSwapping = true; // ล็อกไว้ไม่ให้ทำซ้ำ
+
+                    // 1. เริ่มเล่นตัวถัดไปทันที (เตรียมภาพรอไว้)
+                    nextVideo.currentTime = 0;
+                    nextVideo.play();
+
+                    // 2. สลับความชัด (Crossfade)
+                    // ตัวถัดไปค่อยๆ ชัดขึ้น
+                    nextVideo.classList.remove('opacity-0');
+                    nextVideo.classList.add('opacity-100');
+
+                    // ตัวปัจจุบันค่อยๆ จางลง
+                    currentVideo.classList.remove('opacity-100');
+                    currentVideo.classList.add('opacity-0');
+
+                    // 3. รีเซ็ตสถานะเมื่อตัวถัดไปเล่นไปสักพัก (เพื่อให้พร้อมสลับรอบหน้า)
+                    setTimeout(() => {
+                        isSwapping = false;
+                        // สั่งหยุดตัวเก่าเพื่อประหยัดทรัพยากร (หลังจาก Fade จบแล้ว)
+                        currentVideo.pause();
+                    }, fadeDuration + 500);
+                }
+            }
+
+            // คอยเช็คเวลาตลอดขณะเล่น
+            video1.addEventListener('timeupdate', () => {
+                // เช็คเฉพาะตอนที่ Video 1 กำลังโชว์อยู่ (opacity-100)
+                if (video1.classList.contains('opacity-100')) {
+                    checkTimeAndSwap(video1, video2);
+                }
+            });
+
+            video2.addEventListener('timeupdate', () => {
+                // เช็คเฉพาะตอนที่ Video 2 กำลังโชว์อยู่
+                if (video2.classList.contains('opacity-100')) {
+                    checkTimeAndSwap(video2, video1);
+                }
+            });
+
+            // เริ่มต้น: เล่น video1
+            video2.pause();
+            video1.play();
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1181,12 +1181,12 @@
 
         <style>
             @media (max-width: 768px) {
+                /* แก้ไข: เปลี่ยนเป็น visible เพื่อให้รูปไม่ถูกตัด */
                 .process-card-mobile-fix {
                     opacity: 1 !important;
                     visibility: visible !important;
                     transform: none !important;
-                    overflow: hidden !important; /* ใช้ hidden เพื่อให้เข้ากับมุมโค้งของการ์ดสีขาว */
-                    border-radius: 2rem !important; 
+                    overflow: visible !important; /* แก้จาก hidden เป็น visible ตามต้นฉบับ */
                     
                     /* Hardware Acceleration */
                     -webkit-transform: perspective(1px) translateZ(0);
@@ -1205,8 +1205,10 @@
                     position: relative;
                     z-index: 10;
                     transform: none !important;
-                    /* ปรับพื้นหลังข้อความในมือถือเป็นสีขาว */
+                    /* พื้นหลังขาว */
                     background-color: rgba(255, 255, 255, 0.98) !important;
+                    border-bottom-left-radius: 32px; /* เพิ่มความโค้งให้เข้ากับ Card */
+                    border-bottom-right-radius: 32px;
                 }
             }
         </style>
@@ -1216,7 +1218,7 @@
             <div class="process-card process-card-mobile-fix !p-0 group flex flex-col h-full bg-white border border-slate-200 rounded-[32px] hover:border-ocean-accent transition-all duration-300 hover:shadow-2xl overflow-hidden"
                 data-aos="fade-up" data-aos-delay="0">
                 
-                <div class="card-image-layer relative h-48 w-full overflow-hidden">
+                <div class="card-image-layer relative h-48 w-full"> 
                     <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1170&auto=format&fit=crop" 
                         alt="Fishing Port"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
@@ -1239,7 +1241,7 @@
             <div class="process-card process-card-mobile-fix !p-0 group flex flex-col h-full bg-white border border-slate-200 rounded-[32px] hover:border-ocean-accent transition-all duration-300 hover:shadow-2xl overflow-hidden"
                 data-aos="fade-up" data-aos-delay="150">
                 
-                <div class="card-image-layer relative h-48 w-full overflow-hidden">
+                <div class="card-image-layer relative h-48 w-full">
                     <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1170&auto=format&fit=crop"
                         alt="Quality Control"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
@@ -1260,7 +1262,7 @@
             <div class="process-card process-card-mobile-fix !p-0 group flex flex-col h-full bg-white border border-slate-200 rounded-[32px] hover:border-ocean-accent transition-all duration-300 hover:shadow-2xl overflow-hidden"
                 data-aos="fade-up" data-aos-delay="300">
                 
-                <div class="card-image-layer relative h-48 w-full overflow-hidden">
+                <div class="card-image-layer relative h-48 w-full">
                     <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop"
                         alt="Cold Chain Logistics"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
@@ -1281,7 +1283,7 @@
             <div class="process-card process-card-mobile-fix !p-0 group flex flex-col h-full bg-white border border-slate-200 rounded-[32px] hover:border-ocean-accent transition-all duration-300 hover:shadow-2xl overflow-hidden"
                 data-aos="fade-up" data-aos-delay="450">
                 
-                <div class="card-image-layer relative h-48 w-full overflow-hidden">
+                <div class="card-image-layer relative h-48 w-full">
                     <img src="https://images.unsplash.com/photo-1565891741441-64926e441838?q=80&w=1171&auto=format&fit=crop"
                         alt="Factory Delivery"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
@@ -1302,7 +1304,6 @@
         </div>
     </div>
 </section>
-
 
         <section class="py-16 md:py-20 px-6 bg-slate-50 border-t border-slate-200">
             <div class="max-w-7xl mx-auto text-center" data-aos="fade-up">
@@ -2052,5 +2053,6 @@
 
 
 </html>
+
 
 
